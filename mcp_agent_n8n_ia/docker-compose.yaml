@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  crewai-api:
+    build: .
+    container_name: crewai-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./uv.lock:/app/uv.lock      
+    networks:
+      - docker-n8n-waha
+
+networks:
+  docker-n8n-waha:
+    external: true

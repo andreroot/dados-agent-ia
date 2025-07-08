@@ -1,0 +1,6 @@
+.env
+__pycache__/
+.DS_Store
+.venv/
+mcp_agent_n8n_ia/.venv/
+mcp-agent-ia/.env
