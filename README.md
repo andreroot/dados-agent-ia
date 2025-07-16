@@ -1,69 +1,87 @@
-# dados-agent-ia
+# 📡 projeto dados-agent-ia
 
-objetivo> uma biblioteca de exemplos de construção de agents, que podem ser aplicaveis e integrar com serviços
+Uma biblioteca de exemplos de construção de agents, que podem ser aplicaveis e integrar com serviços.
+1. Utiliza CrewAI Pydantic e Langchian em teste, junto fastapi
+2. Executa python que são acessados via workflow N8N para execução de query que são respostas das solicitações via agent IA N8N
 
-> contem poc com crewAI e pydantic
+### Scripts | acessados via workflow N8N 🔔
+1. Todos os scripts python são acionados via ssh - script_process_monitoria/shell_script
 
-> poc usando fast api
+    > consulta processos thunders executados com sucesso
+    run_workflow_n8n_sqlserver_alertas_erros_operacionais.sh -> script_process_monitoria/src/run_workflow_n8n_sqlserver_alertas.py
 
-### CrewAI Pydantic FastApi | construção dos agents
+    > consulta erros na monitoria
+    run_workflow_n8n_sqlserver_alertas_erros_operacionais.sh ->  script_process_monitoria/src/run_workflow_n8n_erros_operacionais.py
 
-utilizando plataforma crewia
+    > consulta alertas
+    run_workflow_n8n_athena_execution.sh ->  script_process_monitoria/src/run_workflow_n8n_athena.py
 
-> pip install crewia crewia[tools] langchian pydantic
+    > inserir particularidade
 
-- agents: necessitam de informações role(função/especialidade),  goal(), backstory()
+    teste:
+    webhook teste - alterar para http://172.16.128.133:5678/webhook-test/...
 
-- tasks: necessitam de um fluxo de contexto para ter mais precisão na respostas
+    prod:
+        curl -X GET 'http://172.16.128.133:5678/webhook-test/execute-python?processo=consulta_particularidade' -H "Content-Type: application/json"  -d '{ "alerta":"erros_boleta_inflacao_futuro"}'
 
-1. virtualenv
+        curl -X POST 'http://172.16.128.133:5678/webhook/trigger_erros_operacionais?processo=insert_particularidade' -H "Content-Type: application/json"  
 
-2. instalação dos pacotes: crewai, crewai-tools, 
+        -d '{"chatId": "5511940147165@c.us","mensagem": "Agent, inserir essas infromações na particularidade","particularidade":{ "msg_particularidade":"via teams Luis - 11/07","data_particularidade":"2025-07-11","alerta":"erros_boleta_inflacao_futuro","boleta":"IC-CC366-25","operador":"Rafael Campos"}}'
+### Agents CrewAI 🎧
 
-3. execução dos comandos
-    crewai create mcp-agent-n8n-ia
-    cd mcp-agent-n8n-ia
-    crewai install
-
-4. fiz adaptações e gerar o resultado, a IA utilizou o endpoint para responder as perguntas
-*no crew.py, usando a api no N8N e usando @tool crie as ferramentas dentro do agent e das tasks*
-
-5. agent especialista em enge nahria de dados e responsavel pelos processo de pipeline
-
-6. tasks que responde duvidas sobre os processos usando o endpoint na n8n
-http://172.16.128.133:5678/webhook/execute-python?processo=processos_executados
-http://172.16.128.133:5678/webhook/execute-python?processo=boletas
+1. construção dos agents crewai e excução via crewai
 
 [CREWAI]
-na pasta mcp_agent_n8n_ia
-mcp_agent_n8n_ia$ crewai run
+    na pasta mcp_agent_n8n_ia
+    mcp_agent_n8n_ia$ crewai run
 
-[FastApi]
-na pasta mcp_agent_n8n_ia/src
-uvicorn mcp_agent_n8n_ia.run_app:app --reload
+    1. utilizando plataforma crewia: dados-agent-ia/mcp_agent_n8n_ia
 
-criar um fluxo com n8n
+        pip install crewia crewia[tools] langchian pydantic
 
-    usando 🧱 Node "Execute Command"
+    - agents: necessitam de informações role(função/especialidade),  goal(), backstory()
 
-teste com curl
+    - tasks: necessitam de um fluxo de contexto para ter mais precisão na respostas
 
-    curl -X POST "http://localhost:8000/executar-crew?nome=processos_error" -H "Content-Type: application/json" -d '{"pergunta": "quantos processos estão com erros"}'
+    2. virtualenv
+
+    3. instalação dos pacotes: crewai, crewai-tools, 
+
+    4. execução dos comandos
+        crewai create mcp-agent-n8n-ia
+        cd mcp-agent-n8n-ia
+        crewai install
+
+    5. fiz adaptações e gerar o resultado, a IA utilizou o endpoint para responder as perguntas
+        *no crew.py, usando a api no N8N e usando @tool crie as ferramentas dentro do agent e das tasks*
+
+    6. agent especialista em enge nahria de dados e responsavel pelos processo de pipeline
+
+    7. tasks que responde duvidas sobre os processos usando o endpoint na n8n
+        http://172.16.128.133:5678/webhook/execute-python?processo=processos_executados
+        http://172.16.128.133:5678/webhook/execute-python?processo=boletas
+
+
+2. construção de crewai e execução via fastapi
+
+[FastApi|CrewAI]
+    na pasta mcp_agent_n8n_ia/src
+    uvicorn mcp_agent_n8n_ia.run_app:app --reload
 
 [docker-fastapi-crew]
-na pasta mcp_agent_n8n_ia
+    na pasta mcp_agent_n8n_ia
+    docker-compose up -d
 
-arquivos usados:
-*docker-compose
-*Dockerfile
+    subir com docker e liberar porta de acesso
 
-comando:
-*docker-compose up -d
+        1. criar um fluxo com n8n
 
-subir com docker e liberar porta de acesso
-    curl -X POST "http://172.16.128.133:8000/executar-crew?nome=processos_error" -H "Content-Type: application/json" -d '{"pergunta": "qual processo esta com maior numero de linhas?"}'
+            usando 🧱 Node "Execute Command"
 
+        2. teste com curl
 
-> scripts com shell script que executam query e retornam a workflow na n8n
+            curl -X POST "http://localhost:8000/executar-crew?nome=processos_error" -H "Content-Type: application/json" -d '{"pergunta": "quantos processos estão com erros"}'
+            curl -X POST "http://172.16.128.133:8000/executar-crew?nome=processos_error" -H "Content-Type: application/json" -d '{"pergunta": "qual processo esta com maior numero de linhas?"}'
+
 
 ### CrewAI Pydantic FastApi | construção 

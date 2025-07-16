@@ -22,11 +22,11 @@ def consulta_alertas(nome_consulta):
     if nome_consulta == 'alertas_operacionais':
         sql_alert = utils.read_file("sqlserver_alertas_erros_operacionais.sql")        
 
-    elif nome_consulta == 'inconsistencia':
-        sql_alert = utils.read_file("sqlserver_alerta_inconsistencia.sql")
+    elif nome_consulta == 'resultado':
+        sql_alert = utils.read_file("sqlserver_alertas_erros_resultados.sql") 
 
     elif nome_consulta == 'posicao':
-        sql_alert = utils.read_file("sqlserver_alerta_inconsistencia.sql")   
+        sql_alert = utils.read_file("sqlserver_alertas_erros_volumes.sql") 
 
     elif nome_consulta == 'particularity':
         sql_alert = utils.read_file("sqlserver_alerta_boletas_particulary.sql")
@@ -51,9 +51,9 @@ if __name__ == '__main__':
     if args[1] == 'alertas_operacionais':
         nome_consulta = 'alertas_operacionais'
     elif args[1] == 'resultado':
-        nome_consulta = 'inconsistencia'    
+        nome_consulta = 'resultado'    
     elif args[1] == 'posicao':  
-        nome_consulta = 'inconsistencia'
+        nome_consulta = 'posicao'
     elif args[1] == 'inconsistencia':  
         nome_consulta = 'inconsistencia'        
     elif args[1] == 'particularity':
